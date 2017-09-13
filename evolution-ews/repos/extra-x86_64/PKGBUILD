@@ -1,0 +1,35 @@
+# $Id$
+# Contributor: Ionut Biru <ibiru@archlinux.org>
+
+pkgname=evolution-ews
+pkgver=3.24.5
+pkgrel=1
+pkgdesc="MS Exchange integration through Exchange Web Services"
+url="https://wiki.gnome.org/Apps/Evolution/EWS"
+arch=(i686 x86_64)
+license=(LGPL2.1)
+depends=(libmspack evolution)
+makedepends=(intltool gnome-common git cmake ninja)
+options=(!emptydirs)
+_commit=fde4a76a5a0e571994d7cd4ead3c41dc30afe3f2  # tags/EVOLUTION_EWS_3_24_5^0
+source=("git+https://git.gnome.org/browse/evolution-ews#commit=$_commit")
+sha256sums=('SKIP')
+
+pkgver() {
+  cd $pkgname
+  git describe --tags | sed 's/^EVOLUTION_EWS_//;s/_/./g;s/-/+/g'
+}
+
+build() {
+  cd $pkgname
+  cmake . -G Ninja \
+    -DCMAKE_INSTALL_PREFIX=/usr \
+    -DLIBEXEC_INSTALL_DIR=/usr/lib/evolution \
+    -DSYSCONF_INSTALL_DIR=/etc
+  ninja
+}
+
+package() {
+  cd $pkgname
+  DESTDIR="$pkgdir" ninja install
+}
